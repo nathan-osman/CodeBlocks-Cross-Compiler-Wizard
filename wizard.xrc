@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resource>
+  <object class="wxPanel" name="CCWASelectCompilers">
+    <object class="wxBoxSizer">
+      <orient>wxVERTICAL</orient>
+      <object class="sizeritem">
+        <object class="wxStaticText" name="">
+          <label>Please select the appropriate compiler for each of the
+build targets below:</label>
+        </object>
+      </object>
+      <object class="sizeritem">
+        <object class="wxStaticText">
+          <label></label>
+        </object>
+      </object>
+      <object class="sizeritem">
+        <object class="wxStaticText" name="">
+          <label>32-bit Windows compiler:</label>
+        </object>
+      </object>
+      <object class="sizeritem">
+        <object class="wxComboBox" name="Win32Compiler">
+          <content/>
+        </object>
+        <flag>wxGROW</flag>
+      </object>
+      <object class="sizeritem">
+        <object class="wxStaticText">
+          <label></label>
+        </object>
+      </object>
+      <object class="sizeritem">
+        <object class="wxStaticText" name="">
+          <label>64-bit Windows compiler:</label>
+        </object>
+      </object>
+      <object class="sizeritem">
+        <object class="wxComboBox" name="Win64Compiler">
+          <content/>
+        </object>
+        <flag>wxGROW</flag>
+      </object>
+    </object>
+  </object>
+  <object class="wxPanel" name="CCWAOptions">
+    <object class="wxBoxSizer">
+      <orient>wxVERTICAL</orient>
+      <object class="sizeritem">
+        <object class="wxStaticText">
+          <label>Please select from the options below to customize the
+project that is generated:</label>
+        </object>
+      </object>
+      <object class="sizeritem">
+        <object class="wxStaticText">
+          <label></label>
+        </object>
+      </object>
+      <object class="sizeritem">
+        <object class="wxStaticText">
+          <label>Template:</label>
+        </object>
+      </object>
+      <object class="sizeritem">
+        <object class="wxListBox" name="Template">
+          <content>
+            <item>Empty</item>
+            <item>Simple Windows API Example</item>
+          </content>
+        </object>
+        <flag>wxEXPAND</flag>
+        <minsize>1,200</minsize>
+      </object>
+    </object>
+  </object>
+</resource>

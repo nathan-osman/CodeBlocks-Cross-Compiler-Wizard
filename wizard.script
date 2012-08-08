@@ -1,0 +1,121 @@
+/*=======================================================================
+          Cross-compiled Windows Application Wizard
+                 Copyright 2012 - Nathan Osman
+
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+=======================================================================*/
+
+// Global variables
+Template      <- 0;
+Win32Compiler <- _T("");
+Win64Compiler <- _T("");
+
+// Initializes the wizard displayed to the user
+function BeginWizard()
+{
+    local intro_message = _T("Welcome to the new cross-compiled Windows Application\n" +
+                             "wizard!\n\nThis wizard will guide you through the process of\n" +
+                             "creating a new project that utilizes the Mingw-w64\n" +
+                             "cross-compiler toolchain, allowing Windows applications\n" +
+                             "to be compiled on other platforms.");
+
+    Wizard.AddInfoPage(_T("CCWAIntro"), intro_message);
+    Wizard.AddProjectPathPage();
+    Wizard.AddPage(_T("CCWAOptions"));
+    Wizard.AddPage(_T("CCWASelectCompilers"));
+}
+
+// Fills the two compiler selection combos with the list of compilers
+function OnEnter_CCWASelectCompilers(fwd)
+{
+    if(fwd)
+    {
+        Wizard.FillComboboxWithCompilers(_T("Win32Compiler"));
+        Wizard.FillComboboxWithCompilers(_T("Win64Compiler"));
+    }
+    
+    return true;
+}
+
+// Grabs the selected compilers from the lists
+function OnLeave_CCWASelectCompilers(fwd)
+{
+    if(fwd)
+    {
+        Win32Compiler = Wizard.GetCompilerFromCombobox(_T("Win32Compiler"));
+        Win64Compiler = Wizard.GetCompilerFromCombobox(_T("Win64Compiler"));
+    }
+    
+    return true;
+}
+
+// Grabs the selected template from the options page
+function OnLeave_CCWAOptions(fwd)
+{
+    if(fwd)
+        Template = Wizard.GetListboxSelection(_T("Template"));
+    
+    return true;
+}
+
+// Returns the path to project files
+function GetFilesDir()
+{
+    switch(Template)
+    {
+        case 1:  return _T("ccwa/simple");
+        default: return _T("");
+    }
+}
+
+// Creates a build target for the specified architecture
+function CreateBuildTarget(project, arch, compiler, debug)
+{
+    local target = project.AddBuildTarget(_T("Windows " + arch + "-bit " +
+                                             (debug?"Debug":"Release")));
+    
+    // Set the target's options
+    local target_name = "win" + arch + "-" + (debug?"debug":"release");
+    
+    target.SetCompilerID(compiler);
+    target.SetTargetFilenameGenerationPolicy(tgfpNone, tgfpNone);
+    target.SetOutputFilename(_T("bin" + wxFILE_SEP_PATH + target_name + wxFILE_SEP_PATH +
+                                target.SuggestOutputFilename() + ".exe"));
+    target.SetObjectOutput(_T("obj" + wxFILE_SEP_PATH + target_name));
+    
+    // Enable debug data if requested
+    if(debug)
+        DebugSymbolsOn(target, compiler);
+    
+    // Ensure that the project files are added to the target
+    local num_files = project.GetFilesCount();
+    for(local i=0; i < num_files; ++i)
+        project.GetFile(i).AddBuildTarget(target.GetTitle());
+}
+
+// Creates and sets up the project
+function SetupProject(project)
+{
+    // Remove existing build targets
+    local num_targets = project.GetBuildTargetsCount();
+    for(local i=num_targets; i >= 0; --i)
+        project.RemoveBuildTarget(i);
+    
+    CreateBuildTarget(project, 32, Win32Compiler, false);
+    CreateBuildTarget(project, 32, Win32Compiler, true);
+    CreateBuildTarget(project, 64, Win64Compiler, false);
+    CreateBuildTarget(project, 64, Win64Compiler, true);
+    
+    return true;
+}
